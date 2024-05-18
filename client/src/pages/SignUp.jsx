@@ -81,7 +81,7 @@ const SignUp = () => {
           },
           minLength: {
             value: 8,
-            message: "Password must have atleast 8 characters"
+            message: "Password must have at least 8 characters"
           },
           validate : (value) => {
             if(!validator.isStrongPassword(value)){
