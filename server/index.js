@@ -2,6 +2,7 @@ import express from "express"
 import mongoose from "mongoose"
 import dotenv from "dotenv"
 import authRouter from "./routes/auth.route.js"
+import error from "./middleware/error.js"
 
 dotenv.config()
 
@@ -18,4 +19,7 @@ mongoose.connect(process.env.MONGO)
     })
 
 app.use(express.json())
+
 app.use('/api/auth',authRouter)
+
+app.use(error)

@@ -1,10 +1,11 @@
 import express from "express"
 import bcrypt from "bcrypt"
 import User from "../models/user.model.js"
+import errorHandler from "../utils/errorHandler.js"
 
 const router = express.Router()
 
-router.post('/sign-up', async (req,res) => {
+router.post('/sign-up', async (req,res,next) => {
     const {username,email,password} = req.body
 
     const salt = bcrypt.genSaltSync()
@@ -15,9 +16,8 @@ router.post('/sign-up', async (req,res) => {
         res.status(201).json("User Created Successfully")
     }
     catch(error){
-        res.status(500).json(error.message)
+        next(error)
     }
-
 
 })
 
