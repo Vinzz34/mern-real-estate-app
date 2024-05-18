@@ -1,24 +1,10 @@
 import express from "express"
-import bcrypt from "bcrypt"
-import User from "../models/user.model.js"
-import errorHandler from "../utils/errorHandler.js"
+import { signup,signin } from "../controllers.js/auth.controller.js"
 
 const router = express.Router()
 
-router.post('/sign-up', async (req,res,next) => {
-    const {username,email,password} = req.body
+router.post('/sign-up', signup)
 
-    const salt = bcrypt.genSaltSync()
-    const hashedPassword = bcrypt.hashSync(password,salt)
-
-    try{
-        await User.create({username,email,password: hashedPassword})
-        res.status(201).json("User Created Successfully")
-    }
-    catch(error){
-        next(error)
-    }
-
-})
+router.post('/sign-in', signin)
 
 export default router
