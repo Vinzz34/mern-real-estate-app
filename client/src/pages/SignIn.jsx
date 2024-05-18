@@ -4,6 +4,8 @@ import validator from "validator"
 import { useNavigate } from "react-router-dom"
 import {useDispatch} from "react-redux"
 import {setUser} from "../redux/user/userSlice"
+import OAuth from "../components/OAuth"
+import instance from "../api/api_instance"
 
 const SignIn = () => {
 
@@ -18,28 +20,15 @@ const SignIn = () => {
 
   const onSubmit = async (data) => {
     try{
-      const response = await fetch('http://localhost:3000/api/auth/sign-in',{
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      })
-
-      const json = await response.json()
-
-      if(json.success === false){
-        setError("root",{
-          message: json.message
-        })
-        return;
-      }
-
-      dispatch(setUser(json))
+      const response = await instance.post('/auth/sign-in',{...data})
+      dispatch(setUser(response.data))
       navigate('/')
     }
     catch(error){
-      console.log(error)
+      console.log(error.response)
+      setError("root",{
+        message: error.response.data.message
+      })
     }
 
   }
@@ -77,6 +66,9 @@ const SignIn = () => {
         )}
 
         <button disabled={isSubmitting} className="p-3 mt-4 text-white bg-slate-700 uppercase rounded-md hover:opacity-95 disabled:opacity-80">Sign In</button>
+
+        <OAuth />
+
       </form>
       <div className="flex gap-2 mt-5">
         <p>Dont have an account?</p>

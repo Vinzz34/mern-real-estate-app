@@ -2,6 +2,8 @@ import {Link} from "react-router-dom"
 import {useForm} from "react-hook-form"
 import validator from "validator"
 import { useNavigate } from "react-router-dom"
+import OAuth from "../components/OAuth"
+import instance from "../api/api_instance"
 
 const SignUp = () => {
 
@@ -15,27 +17,14 @@ const SignUp = () => {
 
   const onSubmit = async (data) => {
     try{
-      const response = await fetch('http://localhost:3000/api/auth/sign-up',{
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      })
-
-      const json = await response.json()
-
-      if(json.success === false){
-        setError("root",{
-          message: json.message
-        })
-        return;
-      }
-
+      await instance.post('/auth/sign-up',{...data})
       navigate('/sign-in')
     }
     catch(error){
-      console.log(error)
+      console.log(error.response)
+      setError("root",{
+        message: error.response.data.message
+      })
     }
 
   }
@@ -94,6 +83,9 @@ const SignUp = () => {
         )}
 
         <button disabled={isSubmitting} className="p-3 mt-4 text-white bg-slate-700 uppercase rounded-md hover:opacity-95 disabled:opacity-80">Sign Up</button>
+        
+        <OAuth />
+
       </form>
       <div className="flex gap-2 mt-5">
         <p>Have an account?</p>
