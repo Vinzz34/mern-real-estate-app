@@ -1,10 +1,12 @@
 import { useSelector } from "react-redux"
 import {useForm} from "react-hook-form"
 import validator from "validator"
-import instance from "../api/api_instance"
 import { useEffect, useRef, useState } from "react"
 import {getDownloadURL, getStorage, ref, uploadBytesResumable} from "firebase/storage"
 import {getApp} from "firebase/app"
+import instance from "../api/api_instance"
+import { useDispatch } from "react-redux"
+import {setUser} from "../redux/user/userSlice"
 
 const Profile = () => {
 
@@ -12,9 +14,12 @@ const Profile = () => {
 
   const fileRef = useRef()
 
+  const dispatch = useDispatch()
+
   const [file,setFile] = useState()
   const [filePerc,setFilePerc] = useState(0)
   const [fileError,setFileError] = useState(false)
+  const [updateStatus,setUpdateStatus] = useState(false)
 
   const {
     register,
@@ -25,7 +30,7 @@ const Profile = () => {
     formState : {errors,isSubmitting}} = useForm({
       defaultValues: {
         username: currentUser.username,
-        email: currentUser.email
+        email: currentUser.email,
       }
     })
 
@@ -56,7 +61,21 @@ const Profile = () => {
   },[file,setValue])
 
   const onSubmit = async (data) => {
-    console.log(data)
+
+    let {password, ...rest} = data
+    if(password === '') password = undefined
+
+    try{
+      const response = await instance.post(`/user/update/${currentUser._id}`,{...rest,password})
+      dispatch(setUser(response.data))
+      setUpdateStatus(true)
+    }
+    catch(error){
+      console.log(error.response)
+      setError("root",{
+        message: error.response.data.message
+      })
+    }
   }
 
   return (
@@ -117,6 +136,12 @@ const Profile = () => {
         <span className="text-red-700 cursor-pointer">Delete Account</span>
         <span className="text-red-700 cursor-pointer">Sign out</span>
       </div>
+      {errors.root && (
+        <div className="text-sm text-red-500">{errors.root.message}</div>
+      )}
+      {updateStatus && (
+        <div className="text-sm text-green-700">User is updated successfully!</div>
+      )}
     </div>
   )
 }

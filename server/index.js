@@ -3,7 +3,9 @@ import mongoose from "mongoose"
 import dotenv from "dotenv"
 import cors from "cors"
 import authRouter from "./routes/auth.route.js"
+import userRouter from "./routes/user.route.js"
 import error from "./middleware/error.js"
+import cookieParser from "cookie-parser"
 
 dotenv.config()
 
@@ -19,10 +21,12 @@ mongoose.connect(process.env.MONGO)
         console.log(error)
     })
 
-app.use(cors())
+app.use(cors({credentials: true, origin: 'http://localhost:5173'}));
 
 app.use(express.json())
+app.use(cookieParser())
 
 app.use('/api/auth',authRouter)
+app.use('/api/user',userRouter)
 
 app.use(error)
