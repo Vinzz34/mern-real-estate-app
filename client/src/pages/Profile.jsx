@@ -66,9 +66,22 @@ const Profile = () => {
     if(password === '') password = undefined
 
     try{
-      const response = await instance.post(`/user/update/${currentUser._id}`,{...rest,password})
+      const response = await instance.patch(`/user/update/${currentUser._id}`,{...rest,password})
       dispatch(setUser(response.data))
       setUpdateStatus(true)
+    }
+    catch(error){
+      console.log(error.response)
+      setError("root",{
+        message: error.response.data.message
+      })
+    }
+  }
+
+  const handleDeleteUser = async () => {
+    try{
+      await instance.delete(`/user/delete/${currentUser._id}`)
+      dispatch(setUser(null))
     }
     catch(error){
       console.log(error.response)
@@ -133,7 +146,7 @@ const Profile = () => {
         <button disabled={isSubmitting} className="p-3 mt-4 text-white bg-slate-700 uppercase rounded-md hover:opacity-95 disabled:opacity-80">Update</button>
       </form>
       <div className="flex justify-between mt-4">
-        <span className="text-red-700 cursor-pointer">Delete Account</span>
+        <span onClick={handleDeleteUser} className="text-red-700 cursor-pointer">Delete Account</span>
         <span className="text-red-700 cursor-pointer">Sign out</span>
       </div>
       {errors.root && (
