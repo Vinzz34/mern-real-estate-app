@@ -7,12 +7,15 @@ import {getApp} from "firebase/app"
 import instance from "../api/api_instance"
 import { useDispatch } from "react-redux"
 import {setUser} from "../redux/user/userSlice"
+import { useNavigate } from "react-router-dom"
 
 const Profile = () => {
 
   const {currentUser} = useSelector((state) => state.user)
 
   const fileRef = useRef()
+
+  const navigate = useNavigate()
 
   const dispatch = useDispatch()
 
@@ -157,6 +160,9 @@ const Profile = () => {
         )}
 
         <button disabled={isSubmitting} className="p-3 mt-4 text-white bg-slate-700 uppercase rounded-md hover:opacity-95 disabled:opacity-80">Update</button>
+
+        <button onClick={() => navigate('/create-listing')} className="p-3 mt-4 text-white bg-green-700 uppercase rounded-md hover:opacity-95">create listing</button>
+
       </form>
       <div className="flex justify-between mt-4">
         <span onClick={handleDeleteUser} className="text-red-700 cursor-pointer">Delete Account</span>
