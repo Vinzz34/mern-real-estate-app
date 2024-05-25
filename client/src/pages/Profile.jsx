@@ -122,6 +122,19 @@ const Profile = () => {
     }
   }
 
+  const deleteListing = async (id) => {
+    try{
+      await instance.delete('/listing/delete/' + id)
+      setListings(listings.filter(listing => listing._id !== id))
+    }
+    catch(error){
+      console.log(error.response)
+      setError("delete",{
+        message: error.response.data.message
+      })
+    }
+  }
+
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h2 className="text-3xl font-semibold text-center my-7">Profile</h2>
@@ -209,12 +222,15 @@ const Profile = () => {
                     <Link className="font-semibold">{listing.name}</Link>
                   </div>
                   <div className="grid">
-                    <button className="text-red-700 uppercase">delete</button>
+                    <button onClick={() => deleteListing(listing._id)} className="text-red-700 uppercase">delete</button>
                     <button className="text-green-700 uppercase">edit</button>
                   </div>
                 </div>
               ))}
             </div>
+            {errors.delete && (
+              <div className="text-sm text-red-500">{errors.delete.message}</div>
+            )}
           </div>
         )}
       </div>
