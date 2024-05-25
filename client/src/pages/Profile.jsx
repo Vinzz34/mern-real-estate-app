@@ -39,7 +39,7 @@ const Profile = () => {
 
   useEffect(() => {
     const handleFileUpload = async (file) => {
-      const app =getApp()
+      const app = getApp()
       const storage = getStorage(app)
       const fileName = new Date().getTime() + file.name;
       const storageRef = ref(storage,fileName)
