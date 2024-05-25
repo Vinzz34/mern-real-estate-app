@@ -7,7 +7,7 @@ import {getApp} from "firebase/app"
 import instance from "../api/api_instance"
 import { useDispatch } from "react-redux"
 import {setUser} from "../redux/user/userSlice"
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
 const Profile = () => {
 
@@ -23,6 +23,8 @@ const Profile = () => {
   const [filePerc,setFilePerc] = useState(0)
   const [fileError,setFileError] = useState(false)
   const [updateStatus,setUpdateStatus] = useState(false)
+
+  const [listings,setListings] = useState([])
 
   const {
     register,
@@ -107,6 +109,19 @@ const Profile = () => {
     }
   }
 
+  const showListings = async () => {
+    try{
+      const response = await instance.get('/user/listings/'+ currentUser._id) 
+      setListings(response.data)
+    } 
+    catch(error){
+      console.log(error.response)
+      setError("listings",{
+        message: error.response.data.message
+      })
+    }
+  }
+
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h2 className="text-3xl font-semibold text-center my-7">Profile</h2>
@@ -174,6 +189,35 @@ const Profile = () => {
       {updateStatus && (
         <div className="text-sm text-green-700">User is updated successfully!</div>
       )}
+      <div>
+        <p onClick={showListings} className="text-green-700 text-center my-7 cursor-pointer">Show listings</p>
+
+        {errors.listings && (
+          <div className="text-sm text-red-500">{errors.listings.message}</div>
+        )}
+
+        {listings.length > 0 && (
+          <div>
+            <h3 className="text-2xl font-semibold text-center mb-7">Your Listings</h3>
+            <div className="grid gap-4">
+              {listings.map(listing => (
+                <div className="border p-3 flex justify-between items-center" key={listing._id}>
+                  <div className="flex items-center gap-2">
+                    <Link>
+                      <img className="w-16 h-16 object-contain" src={listing.imageUrls[0]} alt="listing image" />
+                    </Link>
+                    <Link className="font-semibold">{listing.name}</Link>
+                  </div>
+                  <div className="grid">
+                    <button className="text-red-700 uppercase">delete</button>
+                    <button className="text-green-700 uppercase">edit</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
