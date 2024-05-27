@@ -1,8 +1,10 @@
 import express from "express"
-import { createListing,deleteListing,updateListing } from "../controllers/listing.controller.js"
+import { createListing,deleteListing,updateListing,getListing } from "../controllers/listing.controller.js"
 import { verifyUser } from "../middleware/verifyUser.js"
 
 const router = express.Router()
+
+router.get('/:id',getListing)
 
 router.use(verifyUser)
 router.post('/create',createListing)

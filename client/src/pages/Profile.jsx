@@ -223,7 +223,7 @@ const Profile = () => {
                   </div>
                   <div className="grid">
                     <button onClick={() => deleteListing(listing._id)} className="text-red-700 uppercase">delete</button>
-                    <button className="text-green-700 uppercase">edit</button>
+                    <button onClick={() => navigate(`/update-listing/${listing._id}`)} className="text-green-700 uppercase">edit</button>
                   </div>
                 </div>
               ))}
