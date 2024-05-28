@@ -125,12 +125,12 @@ const CreateListing = () => {
 
       setLoading(true)
       setError(false)
-      await instance.post("/listing/create",{
+      const response = await instance.post("/listing/create",{
         ...formData,
         userRef: currentUser._id
       })
       setLoading(false)
-      navigate('/') 
+      navigate(`/listing/${response.data._id}`) 
     }
     catch(error){
       console.log(error.response)

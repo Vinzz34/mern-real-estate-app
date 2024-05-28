@@ -146,7 +146,7 @@ const UpdateListing = () => {
         userRef: currentUser._id
       })
       setLoading(false)
-      navigate('/') 
+      navigate(`/listing/${id}`) 
     }
     catch(error){
       console.log(error.response)

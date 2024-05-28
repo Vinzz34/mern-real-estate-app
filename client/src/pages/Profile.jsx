@@ -216,10 +216,10 @@ const Profile = () => {
               {listings.map(listing => (
                 <div className="border p-3 flex justify-between items-center" key={listing._id}>
                   <div className="flex items-center gap-2">
-                    <Link>
+                    <Link to={`/listing/${listing._id}`}>
                       <img className="w-16 h-16 object-contain" src={listing.imageUrls[0]} alt="listing image" />
                     </Link>
-                    <Link className="font-semibold">{listing.name}</Link>
+                    <Link to={`/listing/${listing._id}`} className="font-semibold">{listing.name}</Link>
                   </div>
                   <div className="grid">
                     <button onClick={() => deleteListing(listing._id)} className="text-red-700 uppercase">delete</button>
