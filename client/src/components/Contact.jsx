@@ -10,7 +10,7 @@ const Contact = ({ listing }) => {
     const getUser = async () => {
       try {
         const response = await instance.get(`/user/${listing.userRef}`);
-        setLandLord(response.data.email);
+        setLandLord(response.data);
       } catch (error) {
         console.log(error);
       }
@@ -30,7 +30,7 @@ const Contact = ({ listing }) => {
           <p className="mb-2">
             Contact{" "}
             <span className="lowercase text-slate-700 font-semibold">
-              {landLord}
+              {landLord.username}
             </span>{" "}
             for{" "}
             <span className="lowercase text-slate-700 font-semibold">
@@ -44,7 +44,7 @@ const Contact = ({ listing }) => {
             value={message}
           />
           <a
-            href={`mailto:${landLord}?subject=Regarding ${listing.name}&body=${message}`}
+            href={`mailto:${landLord.email}?subject=Regarding ${listing.name}&body=${message}`}
             className="bg-slate-700 text-white w-full block text-center uppercase p-3 rounded-md hover:opacity-95"
           >
             Send message
