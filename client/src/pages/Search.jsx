@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import instance from "../api/api_instance";
+import ListingCard from "../components/ListingCard";
+import Loading from "../components/Loading";
 
 const Search = () => {
   const navigate = useNavigate();
@@ -13,6 +16,10 @@ const Search = () => {
     sort: "createdAt",
     order: "desc",
   });
+
+  const [listings, setListings] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [showMore, setShowMore] = useState(false);
 
   const handleChange = (e) => {
     if (e.target.id === "searchTerm") {
@@ -87,7 +94,43 @@ const Search = () => {
         order: orderFromUrl || "desc",
       });
     }
+
+    const fetchListings = async () => {
+      try {
+        setLoading(true);
+        setShowMore(false);
+        const response = await instance(`/listing?${urlParams.toString()}`);
+        if (response.data.length > 8) {
+          setShowMore(true);
+        } else {
+          setShowMore(false);
+        }
+        setListings(response.data);
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
+        console.log(error);
+      }
+    };
+
+    fetchListings();
   }, [window.location.search]);
+
+  const showMoreListings = async () => {
+    const startIndex = listings.length;
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.set("startIndex", startIndex);
+
+    try {
+      const response = await instance(`/listing?${urlParams.toString()}`);
+      if (response.data.length < 9) {
+        setShowMore(false);
+      }
+      setListings([...listings, ...response.data]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="flex flex-col md:flex-row">
@@ -192,10 +235,32 @@ const Search = () => {
           search
         </button>
       </form>
-      <div className="m-5 flex-1">
-        <h2 className="text-3xl font-semibold text-slate-700 border-b p-3">
+      <div className="flex-1">
+        <h2 className="text-3xl font-semibold text-slate-700 border-b p-3 m-5">
           Listing results:
         </h2>
+        <div className="p-7 flex flex-wrap gap-4">
+          {loading && <Loading />}
+
+          {!loading && listings.length === 0 && (
+            <p className="text-lg">No listings found!</p>
+          )}
+
+          {!loading &&
+            listings &&
+            listings.map((listing) => (
+              <ListingCard key={listing._id} listing={listing} />
+            ))}
+
+          {showMore && (
+            <button
+              onClick={showMoreListings}
+              className="text-green-700 hover:underline cursor-pointer p-3"
+            >
+              Show more
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

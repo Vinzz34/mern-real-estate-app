@@ -15,6 +15,7 @@ import {
 } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import Contact from "../components/Contact";
+import Loading from "../components/Loading";
 
 const Listing = () => {
   SwiperCore.use([Navigation]);
@@ -47,7 +48,7 @@ const Listing = () => {
   return (
     <div>
       {" "}
-      {loading && <div className="text-2xl text-center">Loading...</div>}{" "}
+      {loading && <Loading />}{" "}
       {error && (
         <div className="text-2xl text-center">Something went wrong!</div>
       )}{" "}

@@ -70,20 +70,20 @@ export const getListings = async (req, res, next) => {
   const limit = parseInt(req.query.limit) || 9;
   const startIndex = parseInt(req.query.startIndex) || 0;
 
-  let offer = req.query.offer || false;
-  let furnished = req.query.furnished || false;
-  let parking = req.query.parking || false;
+  let offer = req.query.offer;
+  let furnished = req.query.furnished;
+  let parking = req.query.parking;
   let type = req.query.type || "all";
 
-  if (!offer) {
+  if (offer === "false" || offer === undefined) {
     offer = { $in: [false, true] };
   }
 
-  if (!furnished) {
+  if (furnished === "false" || furnished === undefined) {
     furnished = { $in: [false, true] };
   }
 
-  if (!parking) {
+  if (parking === "false" || parking === undefined) {
     parking = { $in: [false, true] };
   }
 
