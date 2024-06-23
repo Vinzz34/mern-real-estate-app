@@ -27,7 +27,7 @@ const Header = () => {
     if (searchTermUrl) {
       setSearchTerm(searchTermUrl);
     }
-  }, []);
+  }, [window.location.search]);
 
   return (
     <header className="bg-slate-200">
