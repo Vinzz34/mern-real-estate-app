@@ -1,4 +1,4 @@
-import { Routes, Route,HashRouter} from "react-router-dom";
+import { Routes, Route, BrowserRouter} from "react-router-dom";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Profile from "./pages/Profile";
@@ -12,7 +12,7 @@ import Listing from "./pages/Listing";
 import Search from "./pages/Search";
 const App = () => {
   return (
-    <HashRouter>
+    <BrowserRouter>
       <Header />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -27,7 +27,7 @@ const App = () => {
           <Route path="/update-listing/:id" element={<UpdateListing />} />
         </Route>
       </Routes>
-    </HashRouter>
+    </BrowserRouter>
   );
 };
 
