@@ -251,16 +251,15 @@ const Search = () => {
             listings.map((listing) => (
               <ListingCard key={listing._id} listing={listing} />
             ))}
-
-          {showMore && (
-            <button
-              onClick={showMoreListings}
-              className="text-green-700 hover:underline cursor-pointer p-3"
-            >
-              Show more
-            </button>
-          )}
         </div>
+        {showMore && (
+          <button
+            onClick={showMoreListings}
+            className="text-green-700 hover:underline cursor-pointer px-7 py-3"
+          >
+            Show more
+          </button>
+        )}
       </div>
     </div>
   );
