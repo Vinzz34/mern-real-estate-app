@@ -57,7 +57,7 @@ const Home = () => {
         </h1>
         <div className="text-xs sm:text-sm text-slate-500">
           <p>
-            Sahand Estate will help you find your home fast, easy and
+            Vinzz Estate will help you find your home fast, easy and
             comfortable.
           </p>
           <p>Our expert support are always available.</p>
