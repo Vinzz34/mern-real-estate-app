@@ -13,15 +13,15 @@ import {
   FaParking,
   FaChair,
 } from "react-icons/fa";
-import { useSelector } from "react-redux";
 import Contact from "../components/Contact";
 import Loading from "../components/Loading";
+import { useUserStore } from "../store";
 
 const Listing = () => {
   SwiperCore.use([Navigation]);
   const { id } = useParams();
 
-  const { currentUser } = useSelector((state) => state.user);
+  const { user } = useUserStore();
 
   const [listing, setListing] = useState();
   const [loading, setLoading] = useState(false);
@@ -150,7 +150,7 @@ const Listing = () => {
               </div>
             </div>
 
-            {currentUser && currentUser._id !== listing.userRef && (
+            {user && user._id !== listing.userRef && (
               <button
                 onClick={() => setContact(true)}
                 className={`${contact ? "hidden" : ""} bg-slate-700 text-white w-full uppercase p-3 rounded-md hover:opacity-95`}

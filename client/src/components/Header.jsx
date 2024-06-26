@@ -1,12 +1,12 @@
 import { FaSearch } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
+import { useUserStore } from "../store";
 
 const Header = () => {
   const navigate = useNavigate();
 
-  const { currentUser } = useSelector((state) => state.user);
+  const { user } = useUserStore();
 
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -64,10 +64,10 @@ const Header = () => {
           >
             About
           </Link>
-          {currentUser ? (
+          {user ? (
             <Link to="/profile">
               <img
-                src={currentUser.avatar}
+                src={user.avatar}
                 className="w-7 h-7 object-cover rounded-full"
                 alt="profile"
               />

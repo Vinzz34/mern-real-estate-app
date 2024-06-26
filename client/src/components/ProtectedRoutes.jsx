@@ -1,11 +1,14 @@
-import {useSelector} from "react-redux"
-import { Navigate, Outlet } from "react-router-dom"
+import { Navigate, Outlet } from "react-router-dom";
+import { useUserStore } from "../store";
 
 const ProtectedRoutes = () => {
+  const { user } = useUserStore();
 
-  const {currentUser} = useSelector((state) => state.user)
+  return user === null ? (
+    <Navigate to="/sign-in" replace={true} />
+  ) : (
+    <Outlet />
+  );
+};
 
-  return currentUser === null ? <Navigate to='/sign-in' replace={true} />  : <Outlet />
-}
-
-export default ProtectedRoutes
+export default ProtectedRoutes;
