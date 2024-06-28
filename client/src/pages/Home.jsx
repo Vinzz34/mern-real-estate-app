@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import instance from "../api/api_instance";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -7,45 +5,40 @@ import { Navigation } from "swiper/modules";
 import SwiperCore from "swiper";
 import "swiper/css/bundle";
 import ListingCard from "../components/ListingCard";
+import { useQuery } from "@tanstack/react-query";
+
+const fetchOfferListings = async () => {
+  const { data } = await instance("/listing?offer=true&limit=4");
+  return data;
+};
+
+const fetchRentListings = async () => {
+  const { data } = await instance("/listing?type=rent&limit=4");
+  return data;
+};
+
+const fetchSaleListings = async () => {
+  const { data } = await instance("/listing?type=sell&limit=4");
+  return data;
+};
 
 const Home = () => {
   SwiperCore.use([Navigation]);
-  const [offerListings, setOfferListings] = useState([]);
-  const [rentListings, setRentListings] = useState([]);
-  const [saleListings, setSaleListings] = useState([]);
 
-  useEffect(() => {
-    const fetchOfferListings = async () => {
-      try {
-        const response = await instance("/listing?offer=true&limit=4");
-        setOfferListings(response.data);
-        fetchRentListings();
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    const fetchRentListings = async () => {
-      try {
-        const response = await instance("/listing?type=rent&limit=4");
-        setRentListings(response.data);
-        fetchSaleListings();
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    const fetchSaleListings = async () => {
-      try {
-        const response = await instance("/listing?type=sell&limit=4");
-        setSaleListings(response.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchOfferListings();
-  }, []);
+  const { data: offerListings } = useQuery({
+    queryKey: ["offerListings"],
+    queryFn: fetchOfferListings,
+  });
+  const { data: rentListings } = useQuery({
+    queryKey: ["rentListings"],
+    queryFn: fetchRentListings,
+    enabled: !!offerListings,
+  });
+  const { data: saleListings } = useQuery({
+    queryKey: ["saleListings"],
+    queryFn: fetchSaleListings,
+    enabled: !!rentListings,
+  });
 
   return (
     <div>

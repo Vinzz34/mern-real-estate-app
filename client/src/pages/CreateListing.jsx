@@ -9,6 +9,7 @@ import { useState } from "react";
 import instance from "../api/api_instance";
 import { useNavigate } from "react-router-dom";
 import { useUserStore } from "../store";
+import { useMutation } from "@tanstack/react-query";
 
 const CreateListing = () => {
   const navigate = useNavigate();
@@ -33,8 +34,6 @@ const CreateListing = () => {
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [uploadImageError, setUploadImageError] = useState(false);
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const handleUpload = () => {
     if (files.length > 0 && files.length < 7) {
@@ -124,30 +123,31 @@ const CreateListing = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
+  const {
+    mutate,
+    isPending: loading,
+    error,
+  } = useMutation({
+    mutationFn: async () => {
       if (formData.imageUrls.length < 1) {
-        return setError("You must upload at least one image");
+        throw new Error("You must upload at least one image");
       }
 
       if (+formData.regularPrice < +formData.discountPrice) {
-        return setError("Discount price must be lower than regular price");
+        throw new Error("Discount price must be lower than regular price");
       }
 
-      setLoading(true);
-      setError(false);
-      const response = await instance.post("/listing/create", {
+      const { data } = await instance.post(`/listing/create/`, {
         ...formData,
         userRef: user._id,
       });
-      setLoading(false);
-      navigate(`/listing/${response.data._id}`);
-    } catch (error) {
-      console.log(error.response);
-      setError(error.response.data.message);
-      setLoading(false);
-    }
+      navigate(`/listing/${data._id}`);
+    },
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    mutate();
   };
 
   const handleImageDelete = (index) => {

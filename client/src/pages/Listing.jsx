@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import instance from "../api/api_instance";
 import { useParams } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -16,6 +16,12 @@ import {
 import Contact from "../components/Contact";
 import Loading from "../components/Loading";
 import { useUserStore } from "../store";
+import { useQuery } from "@tanstack/react-query";
+
+const fetchListing = async (id) => {
+  const response = await instance.get(`/listing/${id}`);
+  return response.data;
+};
 
 const Listing = () => {
   SwiperCore.use([Navigation]);
@@ -23,28 +29,15 @@ const Listing = () => {
 
   const { user } = useUserStore();
 
-  const [listing, setListing] = useState();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
   const [copy, setCopy] = useState(false);
   const [contact, setContact] = useState(false);
 
-  useEffect(() => {
-    const fetchListingData = async () => {
-      try {
-        setLoading(true);
-        const response = await instance.get(`/listing/${id}`);
-        setLoading(false);
-        setListing(response.data);
-        setError(false);
-      } catch (error) {
-        console.log(error);
-        setLoading(false);
-        setError(true);
-      }
-    };
-    fetchListingData();
-  }, [id]);
+  const {
+    data: listing,
+    isLoading: loading,
+    error,
+  } = useQuery({ queryKey: ["listing", id], queryFn: () => fetchListing(id) });
+
   return (
     <div>
       {" "}

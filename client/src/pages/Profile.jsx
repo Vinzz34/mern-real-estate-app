@@ -11,9 +11,22 @@ import { getApp } from "firebase/app";
 import instance from "../api/api_instance";
 import { Link, useNavigate } from "react-router-dom";
 import { useUserStore } from "../store";
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import Loading from "../components/Loading";
+
+const fetchListings = async (userId) => {
+  const { data } = await instance.get("/user/listings/" + userId);
+  return data;
+};
+
+const deleteRequest = async (id) => {
+  await instance.delete("/listing/delete/" + id);
+};
 
 const Profile = () => {
-  const { user,setUser } = useUserStore();
+  const { user, setUser } = useUserStore();
+
+  const queryClient = useQueryClient();
 
   const fileRef = useRef();
 
@@ -23,8 +36,7 @@ const Profile = () => {
   const [filePerc, setFilePerc] = useState(0);
   const [fileError, setFileError] = useState(false);
   const [updateStatus, setUpdateStatus] = useState(false);
-
-  const [listings, setListings] = useState([]);
+  const [showListings, setShowListings] = useState(false);
 
   const {
     register,
@@ -113,28 +125,29 @@ const Profile = () => {
     }
   };
 
-  const showListings = async () => {
-    try {
-      const response = await instance.get("/user/listings/" + user._id);
-      setListings(response.data);
-    } catch (error) {
-      console.log(error.response);
-      setError("listings", {
-        message: error.response.data.message,
-      });
-    }
-  };
+  const {
+    data: listings,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["listings", user._id],
+    queryFn: () => fetchListings(user._id),
+  });
+
+  const {
+    mutate,
+    isError: isDeleteError,
+    error: deleteError,
+  } = useMutation({
+    mutationFn: (id) => deleteRequest(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["listings", user._id]);
+    },
+  });
 
   const deleteListing = async (id) => {
-    try {
-      await instance.delete("/listing/delete/" + id);
-      setListings(listings.filter((listing) => listing._id !== id));
-    } catch (error) {
-      console.log(error.response);
-      setError("delete", {
-        message: error.response.data.message,
-      });
-    }
+    mutate(id);
   };
 
   return (
@@ -261,62 +274,70 @@ const Profile = () => {
       )}
       <div>
         <p
-          onClick={showListings}
+          onClick={() => setShowListings(true)}
           className="text-green-700 text-center my-7 cursor-pointer"
         >
           Show listings
         </p>
 
-        {errors.listings && (
-          <div className="text-sm text-red-500">{errors.listings.message}</div>
-        )}
-
-        {listings.length > 0 && (
+        {showListings && (
           <div>
-            <h3 className="text-2xl font-semibold text-center mb-7">
-              Your Listings
-            </h3>
-            <div className="grid gap-4">
-              {listings.map((listing) => (
-                <div
-                  className="border p-3 flex justify-between items-center"
-                  key={listing._id}
-                >
-                  <div className="flex items-center gap-2">
-                    <Link to={`/listing/${listing._id}`}>
-                      <img
-                        className="w-16 h-16 object-contain"
-                        src={listing.imageUrls[0]}
-                        alt="listing image"
-                      />
-                    </Link>
-                    <Link
-                      to={`/listing/${listing._id}`}
-                      className="font-semibold"
+            {isLoading && <Loading />}
+
+            {isError && (
+              <div className="text-sm text-red-500">{error.message}</div>
+            )}
+
+            {listings?.length > 0 && (
+              <div>
+                <h3 className="text-2xl font-semibold text-center mb-7">
+                  Your Listings
+                </h3>
+                <div className="grid gap-4">
+                  {listings.map((listing) => (
+                    <div
+                      className="border p-3 flex justify-between items-center"
+                      key={listing._id}
                     >
-                      {listing.name}
-                    </Link>
-                  </div>
-                  <div className="grid">
-                    <button
-                      onClick={() => deleteListing(listing._id)}
-                      className="text-red-700 uppercase"
-                    >
-                      delete
-                    </button>
-                    <button
-                      onClick={() => navigate(`/update-listing/${listing._id}`)}
-                      className="text-green-700 uppercase"
-                    >
-                      edit
-                    </button>
-                  </div>
+                      <div className="flex items-center gap-2">
+                        <Link to={`/listing/${listing._id}`}>
+                          <img
+                            className="w-16 h-16 object-contain"
+                            src={listing.imageUrls[0]}
+                            alt="listing image"
+                          />
+                        </Link>
+                        <Link
+                          to={`/listing/${listing._id}`}
+                          className="font-semibold"
+                        >
+                          {listing.name}
+                        </Link>
+                      </div>
+                      <div className="grid">
+                        <button
+                          onClick={() => deleteListing(listing._id)}
+                          className="text-red-700 uppercase"
+                        >
+                          delete
+                        </button>
+                        <button
+                          onClick={() =>
+                            navigate(`/update-listing/${listing._id}`)
+                          }
+                          className="text-green-700 uppercase"
+                        >
+                          edit
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            {errors.delete && (
-              <div className="text-sm text-red-500">
-                {errors.delete.message}
+                {isDeleteError && (
+                  <div className="text-sm text-red-500">
+                    {deleteError.message}
+                  </div>
+                )}
               </div>
             )}
           </div>
