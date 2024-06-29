@@ -32,7 +32,10 @@ const Header = () => {
   return (
     <header className="bg-slate-200">
       <div className="flex justify-between items-center max-w-6xl mx-auto p-3">
-        <Link to="/" className="text-sm sm:text-xl font-bold flex flex-wrap">
+        <Link
+          to="/"
+          className="text-normal sm:text-xl font-bold flex flex-wrap"
+        >
           <span className="text-slate-500">Vinzz</span>
           <span className="text-slate-700">Estate</span>
         </Link>

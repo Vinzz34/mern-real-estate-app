@@ -3,6 +3,15 @@ import { useNavigate } from "react-router-dom";
 import instance from "../api/api_instance";
 import ListingCard from "../components/ListingCard";
 import Loading from "../components/Loading";
+import { useInfiniteQuery } from "@tanstack/react-query";
+
+const fetchListings = async ({ queryKey, pageParam }) => {
+  const searchQuery = queryKey[1];
+  const urlParams = new URLSearchParams(searchQuery);
+  urlParams.set("startIndex", pageParam);
+  const response = await instance(`/listing?${urlParams.toString()}`);
+  return response.data;
+};
 
 const Search = () => {
   const navigate = useNavigate();
@@ -17,9 +26,20 @@ const Search = () => {
     order: "desc",
   });
 
-  const [listings, setListings] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [showMore, setShowMore] = useState(false);
+  const urlParams = new URLSearchParams(window.location.search);
+
+  const {
+    data,
+    isPending: loading,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["searchListings", urlParams.toString()],
+    queryFn: fetchListings,
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, pages) =>
+      lastPage.length < 9 ? undefined : pages.length,
+  });
 
   const handleChange = (e) => {
     if (e.target.id === "searchTerm") {
@@ -94,43 +114,7 @@ const Search = () => {
         order: orderFromUrl || "desc",
       });
     }
-
-    const fetchListings = async () => {
-      try {
-        setLoading(true);
-        setShowMore(false);
-        const response = await instance(`/listing?${urlParams.toString()}`);
-        if (response.data.length > 8) {
-          setShowMore(true);
-        } else {
-          setShowMore(false);
-        }
-        setListings(response.data);
-        setLoading(false);
-      } catch (error) {
-        setLoading(false);
-        console.log(error);
-      }
-    };
-
-    fetchListings();
   }, [window.location.search]);
-
-  const showMoreListings = async () => {
-    const startIndex = listings.length;
-    const urlParams = new URLSearchParams(window.location.search);
-    urlParams.set("startIndex", startIndex);
-
-    try {
-      const response = await instance(`/listing?${urlParams.toString()}`);
-      if (response.data.length < 9) {
-        setShowMore(false);
-      }
-      setListings([...listings, ...response.data]);
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   return (
     <div className="flex flex-col md:flex-row">
@@ -241,20 +225,19 @@ const Search = () => {
         </h2>
         <div className="p-7 flex flex-wrap gap-4">
           {loading && <Loading />}
-
-          {!loading && listings.length === 0 && (
+          {!loading && data?.pages.flat().length === 0 && (
             <p className="text-lg">No listings found!</p>
           )}
-
           {!loading &&
-            listings &&
-            listings.map((listing) => (
-              <ListingCard key={listing._id} listing={listing} />
-            ))}
+            data?.pages.map((page) =>
+              page.map((listing) => (
+                <ListingCard key={listing._id} listing={listing} />
+              )),
+            )}
         </div>
-        {showMore && (
+        {hasNextPage && (
           <button
-            onClick={showMoreListings}
+            onClick={fetchNextPage}
             className="text-green-700 hover:underline cursor-pointer px-7 py-3"
           >
             Show more

@@ -43,12 +43,12 @@ const Home = () => {
   return (
     <div>
       <div className="flex flex-col gap-6 max-w-6xl mx-auto px-3 py-28">
-        <h1 className="text-3xl lg:text-6xl text-slate-700 font-bold">
+        <h1 className="text-4xl lg:text-6xl text-slate-700 font-bold">
           Find your next <span className="text-slate-500">perfect</span>
           <br />
           place with ease
         </h1>
-        <div className="text-xs sm:text-sm text-slate-500">
+        <div className="text-sm text-slate-500">
           <p>
             Vinzz Estate will help you find your home fast, easy and
             comfortable.
@@ -57,7 +57,7 @@ const Home = () => {
         </div>
         <Link
           to={`/search`}
-          className="text-blue-800 text-xs sm:text-sm font-bold hover:underline"
+          className="text-blue-800 text-sm font-bold hover:underline"
         >
           Let&apos;s get started...
         </Link>
